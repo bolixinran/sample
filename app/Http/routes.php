@@ -26,7 +26,10 @@ Route::get('login', 'SessionsController@create')->name('login');
 Route::post('login', 'SessionsController@store')->name('login');
 Route::delete('logout', 'SessionsController@destroy')->name('logout');
 
-// Route::resource('users', 'UsersController');
+
+
+// Route::resource('users', 'UsersController');  这一行等价于下面的7条
+
 // Route::get('/users', 'UsersController@index')->name('users.index');
 // Route::get('/users/{user}', 'UsersController@show')->name('users.show');
 // Route::get('/users/create', 'UsersController@create')->name('users.create');

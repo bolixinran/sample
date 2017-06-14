@@ -12,6 +12,18 @@ use Auth;//引入用户注册自动登陆
 
 class UsersController extends Controller
 {
+
+  public function __construct()
+    {
+        $this->middleware('auth', [
+            'only' => ['edit', 'update']
+        ]);
+
+        // 我们在 __construct 方法中调用了     方法，该方法接收两个参数，第一个为中间件的名称，第二个为要进行过滤的动作。
+        // 我们通过 only 方法来为 指定动作 使用 Auth 中间件进行过滤。
+
+    }
+
   public function create()
   {
       return view('users.create');
@@ -41,4 +53,37 @@ class UsersController extends Controller
       session()->flash('success', '欢迎，您将在这里开启一段新的旅程~');//保存一段一次请求内的session
       return redirect()->route('users.show', [$user]);//后面那个是路由参数
     }
+
+    public function edit($id)
+    {
+
+        $user = User::findOrFail($id);
+        $this->authorize('update', $user);//权限认证
+        return view('users.edit', compact('user'));
+    }
+
+    public function update($id, Request $request)
+   {
+       $this->authorize('update', $user);
+       $this->validate($request, [
+           'name' => 'required|max:50',
+           'password' => 'confirmed|min:6' //这里的话  是用_confirmation 来判断
+       ]);
+
+       $user = User::findOrFail($id);
+       $this->authorize('update', $user);//权限认证
+
+       $data = [];
+       $data['name'] = $request->name;
+       if ($request->password) {
+           $data['password'] = bcrypt($request->password);
+       }
+       $user->update($data);
+
+       session()->flash('success', '个人资料更新成功！');
+
+
+
+       return redirect()->route('users.show', $id);
+   }
 }

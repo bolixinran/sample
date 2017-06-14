@@ -33,6 +33,19 @@ class AuthController extends Controller
         $this->middleware('guest', ['except' => 'getLogout']);
     }
 
+    public function handle($request, Closure $next)
+    {
+        if ($this->auth->guest()) {
+            if ($request->ajax()) {
+                return response('Unauthorized.', 401);
+            } else {
+                return redirect()->route("login");
+            }
+        }
+
+        return $next($request);
+    }
+
     /**
      * Get a validator for an incoming registration request.
      *
