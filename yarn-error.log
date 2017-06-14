@@ -1,5 +1,5 @@
 Arguments: 
-  /usr/bin/nodejs /usr/share/yarn/bin/yarn.js install
+  /usr/bin/nodejs /usr/share/yarn/bin/yarn.js add jquery --save
 
 PATH: 
   /home/vagrant/.composer/vendor/bin:/home/vagrant/bin:/home/vagrant/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
@@ -32,5 +32,5 @@ Lockfile:
   No lockfile
 
 Trace: 
-  Error: EPROTO: protocol error, symlink '../../../buble/node_modules/acorn/bin/acorn' -> '/home/vagrant/Code/sample/node_modules/acorn-jsx/node_modules/.bin/acorn'
+  Error: EPROTO: protocol error, symlink '../../../normalize-package-data/node_modules/semver/bin/semver' -> '/home/vagrant/Code/sample/node_modules/accord/node_modules/.bin/semver'
       at Error (native)

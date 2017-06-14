@@ -3,9 +3,12 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\User;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
+
+use App\Models\User;//引入模型
+use Auth;//引入用户注册自动登陆
+
 
 class UsersController extends Controller
 {
@@ -20,9 +23,9 @@ class UsersController extends Controller
       return view('users.show', compact('user'));
   }
 
-  public function store(Request $request)
+  public function store(Request $request)//这个是post请求认证数据
     {
-      $this->validate($request, [
+      $this->validate($request, [  //这里将数据进行合法性认证
           'name' => 'required|max:50',
           'email' => 'required|email|unique:users|max:255',
           'password' => 'required|confirmed|min:6'
@@ -33,7 +36,9 @@ class UsersController extends Controller
           'email' => $request->email,
           'password' => bcrypt($request->password),
       ]);
-       session()->flash('success', '欢迎，您将在这里开启一段新的旅程~');
+
+      Auth::login($user);
+      session()->flash('success', '欢迎，您将在这里开启一段新的旅程~');//保存一段一次请求内的session
       return redirect()->route('users.show', [$user]);//后面那个是路由参数
     }
 }
