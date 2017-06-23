@@ -15,24 +15,35 @@ class UsersController extends Controller
 
   public function __construct()
     {
-        $this->middleware('auth', [
-            'only' => ['edit', 'update']
-        ]);
+      $this->middleware('auth', [//只有登陆的用户才能编辑资料  中间件的判断是  当为游客的时候
+          'only' => ['edit', 'update','show','destroy']//只有登陆的用户才能进行用户的查看
+      ]);
 
-        // 我们在 __construct 方法中调用了     方法，该方法接收两个参数，第一个为中间件的名称，第二个为要进行过滤的动作。
+      $this->middleware('guest',[//已经注册的用户还能进行登陆和注册
+          'only' => ['create']   //设置只有注册了的用户才能进行访问
+      ]);
+
+        // 我们在 __construct 方法中调用了middleware方法，该方法接收两个参数，第一个为中间件的名称，第二个为要进行过滤的动作。
         // 我们通过 only 方法来为 指定动作 使用 Auth 中间件进行过滤。
-
     }
 
-  public function create()
-  {
-      return view('users.create');
-  }
+    public function index()
+    {
+        $users = User::paginate(2);//分页
+        return view('users.index', compact('users'));
+    }
+
+    public function create()
+    {
+        return view('users.create');
+        //用于指定一些只允许未登录用户访问的动作，因此我们需要通过对 guest 属性进行设置，只让未登录用户访问登录页面和注册页面。
+    }
 
   public function show($id)
   {
       $user = User::findOrFail($id);
-      return view('users.show', compact('user'));
+      return view('users.show', compact('user'));//一个长度为1的数组  数组里面是个对象
+                                                  //像这种路由都期待一个参数 来决定要显示谁的资料
   }
 
   public function store(Request $request)//这个是post请求认证数据
@@ -64,7 +75,7 @@ class UsersController extends Controller
 
     public function update($id, Request $request)
    {
-       $this->authorize('update', $user);
+
        $this->validate($request, [
            'name' => 'required|max:50',
            'password' => 'confirmed|min:6' //这里的话  是用_confirmation 来判断
@@ -75,9 +86,10 @@ class UsersController extends Controller
 
        $data = [];
        $data['name'] = $request->name;
-       if ($request->password) {
+       if ($request->password) {//当用户的密码不为空时候才更新
            $data['password'] = bcrypt($request->password);
        }
+
        $user->update($data);
 
        session()->flash('success', '个人资料更新成功！');
@@ -85,5 +97,15 @@ class UsersController extends Controller
 
 
        return redirect()->route('users.show', $id);
+   }
+
+
+   public function destroy($id)
+   {
+       $user = User::findOrFail($id);
+       $this->authorize('destroy', $user);//使用授权策略
+       $user->delete();
+       session()->flash('success', '成功删除用户！');
+       return back();
    }
 }
