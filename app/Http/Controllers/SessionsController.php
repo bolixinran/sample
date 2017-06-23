@@ -37,10 +37,16 @@ class SessionsController extends Controller
        ];
 
        if (Auth::attempt($credentials,$request->has('remember'))) {//接受一个数组
-           // 登录成功后的相关操作
-           session()->flash('success', '欢迎回来！');//Auth::user()  这玩意是个对象
-           return redirect()->intended(route('users.show', [Auth::user()]));//[Auth::user()]获取当前用户的信息 如果是数组的话 就自动判断传入的参数
-           //intended重定向到上次尝试访问的页面   没有的话 就访问默认页面
+            if(Auth::user()->activated) {//判断用户是否激活
+              // 登录成功后的相关操作
+              session()->flash('success', '欢迎回来！');//Auth::user()  这玩意是个对象
+              return redirect()->intended(route('users.show', [Auth::user()]));//[Auth::user()]获取当前用户的信息 如果是数组的话 就自动判断传入的参数
+              //intended重定向到上次尝试访问的页面   没有的话 就访问默认页面
+            }else{
+               Auth::logout();
+               session()->flash('warning', '你的账号未激活，请检查邮箱中的注册邮件进行激活。');
+               return redirect('/');
+            }
        } else {
            // 登录失败后的相关操作
            session()->flash('danger', '很抱歉，您的邮箱和密码不匹配');

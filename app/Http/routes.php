@@ -26,7 +26,7 @@ Route::get('login', 'SessionsController@create')->name('login');
 Route::post('login', 'SessionsController@store')->name('login');
 Route::delete('logout', 'SessionsController@destroy')->name('logout');
 
-
+Route::get('signup/confirm/{token}', 'UsersController@confirmEmail')->name('confirm_email');//激活账号路由
 
 // Route::resource('users', 'UsersController');  这一行等价于下面的7条
 
