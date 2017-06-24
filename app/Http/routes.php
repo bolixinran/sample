@@ -50,3 +50,12 @@ Route::post('password/reset', 'Auth\PasswordController@postReset')->name('passwo
 
 
 Route::resource('statuses', 'StatusesController', ['only' => ['store', 'destroy']]);//删除路由
+
+
+//关注的用户
+Route::get('/users/{id}/followings', 'UsersController@followings')->name('users.followings');//显示用户的关注人列表
+Route::get('/users/{id}/followers', 'UsersController@followers')->name('users.followers');//显示用户的粉丝列表
+
+
+Route::post('/users/followers/{id}', 'FollowersController@store')->name('followers.store');
+Route::delete('/users/followers/{id}', 'FollowersController@destroy')->name('followers.destroy');

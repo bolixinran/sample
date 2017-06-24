@@ -10,6 +10,8 @@ use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
 use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
 
+
+use Auth;
 class User extends Model implements AuthenticatableContract,
                                     AuthorizableContract,
                                     CanResetPasswordContract
@@ -71,7 +73,48 @@ class User extends Model implements AuthenticatableContract,
 
     public function feed()
     {
-        return $this->statuses()
-                    ->orderBy('created_at', 'desc');
+        $user_ids = Auth::user()->followings->pluck('id')->toArray();
+        array_push($user_ids, Auth::user()->id);
+        return Status::whereIn('user_id', $user_ids)//拿到关注的用户发布的数据
+                              ->with('user')
+                              ->orderBy('created_at', 'desc');
+    }
+
+
+
+    public function followers()
+    {
+        return $this->belongsToMany(User::Class, 'followers', 'user_id', 'follower_id');
+    }
+    //我们可以通过 followers 来获取粉丝关系列表    $user->followers();
+
+    public function followings()
+    {
+        return $this->belongsToMany(User::Class, 'followers', 'follower_id', 'user_id');
+    }
+
+    //通过 followings 来获取用户关注人列表，如：   $user->followings();
+
+
+    public function follow($user_ids)//关注逻辑
+    {
+        if (!is_array($user_ids)) {
+            $user_ids = compact('user_ids');
+        }
+        $this->followings()->sync($user_ids, false);
+    }
+
+    public function unfollow($user_ids)//取消关注逻辑
+    {
+        if (!is_array($user_ids)) {
+            $user_ids = compact('user_ids');
+        }
+        $this->followings()->detach($user_ids);//这里也是接收一个数组参数
+    }
+
+
+    public function isFollowing($user_id)//判断是否关注了某用户
+    {
+        return $this->followings->contains($user_id);//这个属性怎么来的呢
     }
 }

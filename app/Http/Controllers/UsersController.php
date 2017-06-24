@@ -19,7 +19,7 @@ class UsersController extends Controller
     {
 
       $this->middleware('auth', [//只有登陆的用户才能编辑资料  中间件的判断是  当为游客的时候
-          'only' => ['edit', 'update','show','destroy']//只有登陆的用户才能进行用户的查看
+          'only' => ['edit', 'update','show','destroy','followings', 'followers']//只有登陆的用户才能进行用户的查看
       ]);
 
       $this->middleware('guest',[//已经注册的用户还能进行登陆和注册
@@ -149,4 +149,19 @@ class UsersController extends Controller
         return view('users.show', compact('user', 'statuses'));
     }
 
+    public function followings($id)
+    {
+        $user = User::findOrFail($id);
+        $users = $user->followings()->paginate(30);
+        $title = '关注的人';
+        return view('users.show_follow', compact('users', 'title'));
+    }
+
+    public function followers($id)
+    {
+        $user = User::findOrFail($id);
+        $users = $user->followers()->paginate(30);
+        $title = '粉丝';
+        return view('users.show_follow', compact('users', 'title'));
+    }
 }
