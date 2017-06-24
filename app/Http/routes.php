@@ -47,3 +47,6 @@ Route::post('password/reset', 'Auth\PasswordController@postReset')->name('passwo
 // Route::get('/users/{user}/edit', 'UsersController@edit')->name('users.edit');
 // Route::patch('/users/{user}', 'UsersController@update')->name('users.update');
 // Route::delete('/users/{user}', 'UsersController@destroy')->name('users.destroy');
+
+
+Route::resource('statuses', 'StatusesController', ['only' => ['store', 'destroy']]);//删除路由

@@ -53,13 +53,25 @@ class User extends Model implements AuthenticatableContract,
        return "http://www.gravatar.com/avatar/$hash?s=$size";
    }
 
+   public function statuses()//指明一个用户拥有多条微博
+    {
+        return $this->hasMany(Status::class);
+    }
+
    public function store(Request $request)
     {
-        // $this->validate($request, [
-        //     'name' => 'required|max:50',
-        //     'email' => 'required|email|unique:users|max:255',
-        //     'password' => 'required'
-        // ]);
+        $this->validate($request, [//为什么前面已经验证了一次合法性为什么这里还再验证一次呢
+            'name' => 'required|max:50',
+            'email' => 'required|email|unique:users|max:255',
+            'password' => 'required'
+        ]);
         return;
+    }
+
+
+    public function feed()
+    {
+        return $this->statuses()
+                    ->orderBy('created_at', 'desc');
     }
 }

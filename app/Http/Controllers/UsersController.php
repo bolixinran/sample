@@ -44,12 +44,7 @@ class UsersController extends Controller
         //用于指定一些只允许未登录用户访问的动作，因此我们需要通过对 guest 属性进行设置，只让未登录用户访问登录页面和注册页面。
     }
 
-  public function show($id)
-  {
-      $user = User::findOrFail($id);
-      return view('users.show', compact('user'));//一个长度为1的数组  数组里面是个对象
-                                                  //像这种路由都期待一个参数 来决定要显示谁的资料
-  }
+
 
   public function store(Request $request)//这个是post请求认证数据
     {
@@ -143,6 +138,15 @@ class UsersController extends Controller
         Auth::login($user);
         session()->flash('success', '恭喜你，激活成功！');
         return redirect()->route('users.show', [$user]);
+    }
+
+    public function show($id)
+    {
+        $user = User::findOrFail($id);
+        $statuses = $user->statuses()
+                           ->orderBy('created_at', 'desc')
+                           ->paginate(30);
+        return view('users.show', compact('user', 'statuses'));
     }
 
 }
